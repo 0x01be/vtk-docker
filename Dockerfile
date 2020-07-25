@@ -16,3 +16,9 @@ RUN cmake -DINSTALL_DIR=/opt/vtk ..
 RUN make
 RUN make install
 
+FROM alpine:3.12.0
+
+COPY --from=builder /opt/vtk/ /opt/vtk/
+
+ENV PATH /opt/vyk/bin:$PATH
+
