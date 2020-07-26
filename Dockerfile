@@ -12,9 +12,9 @@ RUN git clone --depth 1 https://gitlab.kitware.com/vtk/vtk.git /vtk
 RUN mkdir /vtk/build
 WORKDIR /vtk/build
 
-RUN cmake -DINSTALL_DIR=/opt/vtk ..
+RUN cmake ..
 RUN make
-RUN make install
+RUN make DESTDIR=/opt/vtk/ install
 
 FROM alpine:3.12.0
 
