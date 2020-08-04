@@ -1,9 +1,6 @@
-FROM alpine:3.12.0 as builder
+FROM 0x01be/alpine:edge as builder
 
-RUN apk add --no-cache --virtual build-dependencies \
-    --repository http://dl-cdn.alpinelinux.org/alpine/edge/main \
-    --repository http://dl-cdn.alpinelinux.org/alpine/edge/community \
-    --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+RUN apk add --no-cache --virtual vtk-build-dependencies \
     git \
     build-base \
     cmake \
@@ -19,7 +16,7 @@ RUN cmake ..
 RUN make
 RUN make DESTDIR=/opt/vtk/ install
 
-FROM alpine:3.12.0
+FROM 0x01be/alpine:edge
 
 COPY --from=builder /opt/vtk/ /opt/vtk/
 
