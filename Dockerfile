@@ -1,4 +1,4 @@
-FROM 0x01be/alpine:edge as builder
+FROM alpine as build
 
 RUN apk add --no-cache --virtual vtk-build-dependencies \
     git \
@@ -7,18 +7,26 @@ RUN apk add --no-cache --virtual vtk-build-dependencies \
     mesa-dev \
     libexecinfo-dev
 
-RUN git clone --depth 1 https://gitlab.kitware.com/vtk/vtk.git /vtk
+ENV REVISION=master
+RUN git clone --depth 1 --branch ${REVISION} https://gitlab.kitware.com/vtk/vtk.git /vtk
 
-RUN mkdir /vtk/build
 WORKDIR /vtk/build
 
 RUN cmake ..
 RUN make
 RUN make DESTDIR=/opt/vtk/ install
 
-FROM 0x01be/alpine:edge
+FROM alpine
 
-COPY --from=builder /opt/vtk/ /opt/vtk/
+COPY --from=build /opt/vtk/ /opt/vtk/
 
-ENV PATH /opt/vtk/bin:$PATH
+ENV USER=vtk \
+    WORKSPACE=/workspace
+RUN adduser-D -u 1000 ${USER} &&\
+    mkdir -p ${WORKSPACE} &&\
+    chown -R ${USER}:${USER} ${WORKSPACE}
+
+USER ${USER}
+WORKDIR ${WORKSPACE}
+ENV PATH=${PATH}:/opt/vtk/bin
 
